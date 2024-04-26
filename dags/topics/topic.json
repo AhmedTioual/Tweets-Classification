@@ -1,0 +1,52 @@
+{
+    "Politics": [
+        "الحكومة المغربية", "gouvernement marocain", "Moroccan government"
+    ],
+    "Economy": [
+        "النمو الاقتصادي في المغرب", "croissance économique au Maroc", "economic growth in Morocco"
+    ],
+    "Culture": [
+        "الفن المغربي", "art marocain", "Moroccan art"
+    ],
+    "Social Issues": [
+        "الفقر في المغرب", "pauvreté au Maroc", "poverty in Morocco"
+    ],
+    "Technology": [
+        "الابتكار التكنولوجي في المغرب", "innovation technologique au Maroc", "technological innovation in Morocco"
+    ],
+    "Environment": [
+        "التلوث في المغرب", "pollution au Maroc", "pollution in Morocco"
+    ],
+    "Sport": ["رياضة في المغرب", "sport au Maroc", "sport in Morocco"
+    ],
+    "Education Reform": [
+    "إصلاح التعليم في المغرب","réforme de l'éducation au Maroc","education reform in Morocco"
+  ],
+  "Youth Empowerment": [
+    "تمكين الشباب في المغرب","autonomisation des jeunes au Maroc","youth empowerment in Morocco"
+  ],
+  "Digital Transformation": [
+    "التحول الرقمي في المغرب","transformation numérique au Maroc","digital transformation in Morocco"
+  ],
+  "Gender Equality": [
+    "المساواة بين الجنسين في المغرب","égalité des genres au Maroc","gender equality in Morocco"
+  ],
+  "Infrastructure Development": [
+    "تطوير البنية التحتية في المغرب","développement des infrastructures au Maroc","infrastructure development in Morocco"
+  ],
+  "Cultural Exchange": [
+    "تبادل ثقافي بين المغرب والعالم","échange culturel entre le Maroc et le monde","cultural exchange between Morocco and the world"
+  ],
+  "Entrepreneurship": [
+    "ريادة الأعمال في المغرب","entrepreneuriat au Maroc","entrepreneurship in Morocco"
+  ],
+  "Tourism": [
+    "السياحة في المغرب","tourisme au Maroc","tourism in Morocco"
+  ],
+  "Public Health Policies": [
+    "سياسات الصحة العامة في المغرب","politiques de santé publique au Maroc","public health policies in Morocco"
+  ],
+  "Rural Development": [
+    "تنمية الريف في المغرب","développement rural au Maroc","rural development in Morocco"
+  ]
+}

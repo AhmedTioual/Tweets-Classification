@@ -6,6 +6,8 @@ import json
 import brotli
 import time
 from pymongo.mongo_client import MongoClient
+import random
+import tempfile
 
 user_header_1 = {
                     "Accept": "*/*",
@@ -74,6 +76,134 @@ user_header_3 = {
             "x-twitter-client-language": "en"
             }
 
+def get_next_topic(json_file_path='dags/topics/topic.json'):
+    try:
+        with open(json_file_path, 'r', encoding='utf-8') as file:
+            topics = json.load(file)
+            log_value = read_from_log()
+            print("Log value:", log_value)
+            print("Number of topics:", len(topics.keys()))
+
+            if len(topics.keys()) == log_value:
+                keep_last_line_only()
+                write_to_log(new_line="0")
+                print("Reset log to 0. No action needed.")
+                return {}
+
+            else:
+                key_index = log_value
+                key = list(topics.keys())[key_index]
+                keep_last_line_only()
+                write_to_log(new_line=str(log_value + 1))
+                print("Returning topic:", {key: topics[key]})
+                return {key: topics[key]}
+
+    except FileNotFoundError:
+        print(f"Error: File '{json_file_path}' not found.")
+        return {}
+
+def write_to_log(file_path="dags/topics/logTopics.txt", new_line="0"):
+    try:
+        with open(file_path, 'a', encoding='utf-8') as file:
+            file.write(new_line + '\n')  # Append the new line of text followed by a newline character
+            print("New line added to logTopics.txt:", new_line)
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+
+def read_from_log(file_path="dags/topics/logTopics.txt"):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+            if lines:
+                last_line = lines[-1].strip()
+                return int(last_line)
+            else:
+                return 0
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+        return None
+
+def keep_last_line_only(file_path="dags/topics/logTopics.txt"):
+    try:
+        # Read all lines from the file
+        with open(file_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+
+        # Check if there are more than two lines
+        if len(lines) > 1:
+            # Extract the last line
+            last_line = lines[-1].strip()
+
+            # Write only the last line back to the file
+            with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(last_line + '\n')
+                print("Only the last line kept in logTopics.txt:", last_line)
+        else:
+            print("No action needed. File has one or zero lines.")
+
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+
+def save_json_to_temp_file(data):
+    """
+    Saves JSON data to a temporary file and returns the path of the temporary file.
+
+    Args:
+        data (dict): Dictionary containing JSON serializable data.
+
+    Returns:
+        str: Path of the temporary file where JSON data is stored.
+    """
+    try:
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+            # Write JSON data to the temporary file
+            json.dump(data, temp_file, indent=4)
+            temp_file.flush()  # Flush to ensure data is written to the file
+            temp_file.seek(0)  # Move file pointer to the beginning
+
+            # Get the temporary file path
+            temp_file_path = temp_file.name
+
+            return temp_file_path
+
+    except Exception as e:
+        print(f"Error occurred while saving JSON to temporary file: {e}")
+        return None
+
+def read_json_file(file_path):
+    """
+    Reads JSON data from a file and returns the parsed JSON content as a dictionary.
+
+    Args:
+        file_path (str): Path to the JSON file.
+
+    Returns:
+        dict or None: Parsed JSON content as a dictionary, or None if an error occurs.
+    """
+    try:
+        with open(file_path, 'r') as json_file:
+            json_data = json.load(json_file)
+            return json_data
+    except FileNotFoundError:
+        print(f"Error: JSON file not found at '{file_path}'.")
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to decode JSON from file '{file_path}'. {e}")
+    except Exception as e:
+        print(f"Error occurred while reading JSON file '{file_path}': {e}")
+    return None
+  
+last_keyword = None
+
+def get_random_user():
+    global last_keyword
+    keywords = ['user_header_1', 'user_header_2', 'user_header_3']
+    
+    while True:
+        keyword = random.choice(keywords)
+        if keyword != last_keyword:
+            last_keyword = keyword
+            return keyword
 
 def extract_json_data(search,next_page="",header=user_header_1):
     # Define the URL
@@ -81,6 +211,7 @@ def extract_json_data(search,next_page="",header=user_header_1):
 
     # Define the request parameters
     variables = {"rawQuery": search, "count": 20, "querySource": "typed_query", "product": "Latest","cursor":next_page}
+    
     features = {
         "rweb_tipjar_consumption_enabled": False,
         "responsive_web_graphql_exclude_directive_enabled": True,
@@ -149,9 +280,9 @@ def get_response_count(response_json):
         #print("KeyError: Could not find the specified key in the response JSON.")
         return 0
     
-def extract_batch_data(tweet_topics,header=user_header_1):
+def extract_batch_data(tweet_topics,header=user_header_1,**kwargs):
   raw_data = []
-  for topic, values in tweet_topics.items():
+  for _, values in tweet_topics.items():
       for value in values:
           try:
             response_json = extract_json_data(value,header=header)
@@ -159,7 +290,7 @@ def extract_batch_data(tweet_topics,header=user_header_1):
                 raw_data.append(response_json)
             else:
                 break
-            for i in range(10):
+            for i in range(4):
               if i == 0 :
                   next_page = len(response_json['data']['search_by_raw_query']['search_timeline']['timeline']['instructions'][0]['entries'])-1
                   next_page = response_json['data']['search_by_raw_query']['search_timeline']['timeline']['instructions'][0]['entries'][next_page]['content']['value']
@@ -179,10 +310,19 @@ def extract_batch_data(tweet_topics,header=user_header_1):
           except Exception as ex:
               print(ex)
           time.sleep(2.5)
-  return raw_data
 
-def transform_batch_data(raw_data,topic):
+
+  temp_file = save_json_to_temp_file(raw_data) 
+  kwargs['ti'].xcom_push(key='raw_batch_data_key', value=temp_file) 
   
+  return True,temp_file
+
+def transform_batch_data(topic,**kwargs):
+  
+  temp_file = kwargs['ti'].xcom_pull(task_ids='extract_tweets_task', key='raw_batch_data_key')
+
+  raw_data = read_json_file(file_path=temp_file)
+
   tweets_data = []
 
   for response_json in raw_data : 
@@ -237,9 +377,17 @@ def transform_batch_data(raw_data,topic):
               # Handle other exceptions
               print("Exception:", ex)
 
-  return tweets_data
+  temp_file = save_json_to_temp_file(tweets_data) 
+  kwargs['ti'].xcom_push(key='clean_data_key', value=temp_file) 
+  
+  return True,temp_file
 
-def load_to_mongodb(data_to_insert):
+def load_to_mongodb(**kwargs):
+    
+    temp_file = kwargs['ti'].xcom_pull(task_ids='transform_tweets_task', key='clean_data_key')
+
+    data_to_insert = read_json_file(file_path=temp_file)
+
     # MongoDB connection URL
     url = "mongodb+srv://mlteam:mlteam1234@cluster0.6y3bpz0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
@@ -263,66 +411,13 @@ def load_to_mongodb(data_to_insert):
         # Close the connection
         client.close()
 
-tweet_topics = {
-    'Politics': [
-        'الحكومة المغربية', 'gouvernement marocain', 'Moroccan government'
-    ],
-    'Economy': [
-        'النمو الاقتصادي في المغرب', 'croissance économique au Maroc', 'economic growth in Morocco'
-    ],
-    'Culture': [
-        'الفن المغربي', 'art marocain', 'Moroccan art'
-    ],
-    'Social Issues': [
-        'الفقر في المغرب', 'pauvreté au Maroc', 'poverty in Morocco'
-    ],
-    'Technology': [
-        'الابتكار التكنولوجي في المغرب', 'innovation technologique au Maroc', 'technological innovation in Morocco'
-    ],
-    'Environment': [
-        'التلوث في المغرب', 'pollution au Maroc', 'pollution in Morocco'
-    ],
-    'Sport': ['رياضة في المغرب', 'sport au Maroc', 'sport in Morocco'
-    ],
-    "Education Reform": [
-    "إصلاح التعليم في المغرب","réforme de l'éducation au Maroc","education reform in Morocco"
-  ],
-  "Youth Empowerment": [
-    "تمكين الشباب في المغرب","autonomisation des jeunes au Maroc","youth empowerment in Morocco"
-  ],
-  "Digital Transformation": [
-    "التحول الرقمي في المغرب","transformation numérique au Maroc","digital transformation in Morocco"
-  ],
-  "Gender Equality": [
-    "المساواة بين الجنسين في المغرب","égalité des genres au Maroc","gender equality in Morocco"
-  ],
-  "Infrastructure Development": [
-    "تطوير البنية التحتية في المغرب","développement des infrastructures au Maroc","infrastructure development in Morocco"
-  ],
-  "Cultural Exchange": [
-    "تبادل ثقافي بين المغرب والعالم","échange culturel entre le Maroc et le monde","cultural exchange between Morocco and the world"
-  ],
-  "Entrepreneurship": [
-    "ريادة الأعمال في المغرب","entrepreneuriat au Maroc","entrepreneurship in Morocco"
-  ],
-  "Tourism": [
-    "السياحة في المغرب","tourisme au Maroc","tourism in Morocco"
-  ],
-  "Public Health Policies": [
-    "سياسات الصحة العامة في المغرب","politiques de santé publique au Maroc","public health policies in Morocco"
-  ],
-  "Rural Development": [
-    "تنمية الريف في المغرب","développement rural au Maroc","rural development in Morocco"
-  ]
-}
-
 # Define the DAG settings
 default_args = {
-    'owner': 'airflow',
+    'owner': 'MLTeam',
     'depends_on_past': False,
-    'start_date': datetime(2024, 4, 23),
+    'start_date': datetime(2024, 4, 24),
     'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'retry_delay': timedelta(minutes=10),
 }
 
 # Define the DAG
@@ -330,38 +425,34 @@ dag = DAG(
     'tweet_topics_processing',
     default_args=default_args,
     description='Process tweet topics data',
-    schedule_interval='@hourly',
+    schedule_interval='@daily',
 )
 
+tweets_dict = get_next_topic()
+user = get_random_user()
 
-# Iterate over the topics and create tasks
-for topic, terms in tweet_topics.items():
-    topic_with_terms = {topic: terms}
-
-    # Replace spaces in topic name to create valid task_id
-    task_id_prefix = topic.replace(' ', '_').lower()
-
-    # Define tasks for each topic
-    extract_task = PythonOperator(
-        task_id=f'extract_{task_id_prefix}',
+# Define tasks for each topic
+extract_task = PythonOperator(
+        task_id=f'extract_tweets_task',
         python_callable=extract_batch_data,
-        op_kwargs={'tweet_topics': topic_with_terms,"header":user_header_1},
+        op_kwargs={'tweet_topics': tweets_dict,"header":user},
         dag=dag,
     )
 
-    transform_task = PythonOperator(
-        task_id=f'transform_{task_id_prefix}',
+transform_task = PythonOperator(
+        task_id='transform_tweets_task',
         python_callable=transform_batch_data,
-        op_kwargs={'raw_data': topic_with_terms, 'topic': topic},
+        op_kwargs={'topic': tweets_dict.keys()},
         dag=dag,
     )
 
-    load_task = PythonOperator(
-        task_id=f'load_{task_id_prefix}_to_mongodb',
+load_task = PythonOperator(
+        task_id=f'load_tweets_to_mongodb_task',
         python_callable=load_to_mongodb,
-        op_kwargs={'clean_data': topic},
+        op_kwargs={'clean_data': "topic"},
         dag=dag,
     )
 
     # Set task dependencies
-    extract_task >> transform_task >> load_task
+
+extract_task >> transform_task >> load_task
