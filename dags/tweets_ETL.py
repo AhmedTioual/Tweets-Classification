@@ -6,212 +6,13 @@ import json
 import brotli
 import time
 from pymongo.mongo_client import MongoClient
-import random
-import tempfile
 
-user_header_1 = {
-                    "Accept": "*/*",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en-US,en;q=0.5",
-                    "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-                    "Connection": "keep-alive",
-                    "content-type": "application/json",
-                    "Cookie": "guest_id_marketing=v1%3A171344721728559785; guest_id_ads=v1%3A171344721728559785; personalization_id=\"v1_GHe0SFbAlPCSfxNXyPRTrw==\"; guest_id=v1%3A171344721728559785; external_referer=padhuUp37zjgzgv1mFWxJ12Ozwit7owX|0|8e8t2xd8A2w%3D; _ga=GA1.2.407514221.1713447191; g_state={\"i_l\":0}; kdt=VEcTPaQvk3prU87Ar4MM7P5bLPc66vDjmV9q2GRa; twid=u%3D1780955256953991168; ct0=252afef22d33c4b4be0b7be5d3f4f86661ed9449aa12270de42d335ee2e9b239b252a318cdf44ddd551b013096ed3f98c48f4cd2fb029b376a96c6bc12555f11a3943fc7c6878783e73ff0af9c246f04; auth_token=3b59938cd93f261ba069889f5274ee38c3fdb48f; lang=en",
-                    "Host": "twitter.com",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-origin",
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
-                    "x-client-transaction-id": "4gXEcaYkeNp8zjsQ7VO4zGVRC7FbCUxrKjnWtXmLFaD5XAA9x551gH1r8Nf/y3Sd9WUcNON1YYZbVfL/iLyr/vwPnLd54Q",
-                    "X-Client-UUID": "e90c4a62-2110-4881-a9de-fa79e8f69cf0",
-                    "x-csrf-token": "252afef22d33c4b4be0b7be5d3f4f86661ed9449aa12270de42d335ee2e9b239b252a318cdf44ddd551b013096ed3f98c48f4cd2fb029b376a96c6bc12555f11a3943fc7c6878783e73ff0af9c246f04",
-                    "x-twitter-active-user": "yes",
-                    "x-twitter-auth-type": "OAuth2Session",
-                    "x-twitter-client-language": "en"
-                }
-
-user_header_2 = {
-                "Accept": "*/*",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Accept-Language": "en-US,en;q=0.5",
-                "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-                "Connection": "keep-alive",
-                "content-type": "application/json",
-                "Cookie": "guest_id_marketing=v1%3A171379298354115241; guest_id_ads=v1%3A171379298354115241; personalization_id=\"v1_MLpslkFpbqqSPvkAp9ssag==\"; _ga=GA1.2.407514221.1713447191; g_state={\"i_l\":0}; kdt=VEcTPaQvk3prU87Ar4MM7P5bLPc66vDjmV9q2GRa; lang=en; att=1-JnETQvoehBug6emlr8wcLgCYgCSUpFSqFphk3iqO; dnt=1; guest_id=v1%3A171379298354115241; gt=1782403076642443538; _twitter_sess=BAh7BiIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7AA%253D%253D--1164b91ac812d853b877e93ddb612b7471bebc74; twid=u%3D1782403538888396800; ct0=f72cd751163e66e684bfbb66475db361b7bf2c986005bd01dd5cf048cce54c99ad6eb295b5293598156a89f2ab9a6f5a9524c7d909fc4a34b473a4dc3e8d1a5f68763676c554857c6a831e3959a91a07; auth_token=cf107966615be39f0d1f90e49f2ad2c382924f92",
-                "Host": "twitter.com",
-                "Referer": "https://twitter.com/search?q=fidel%20odinga&src=typeahead_click",
-                "Sec-Fetch-Dest": "empty",
-                "Sec-Fetch-Mode": "cors",
-                "Sec-Fetch-Site": "same-origin",
-                "TE": "trailers",
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
-                "x-client-transaction-id": "sX5W5M6pHp38Lf67tkovZewpwekw5IoCb+ivLGVit2Ai37tUG/dusC/5ex5/AhfGdPi0ZrDMKn0GBGFjiaT9cXxcCuHnsg",
-                "X-Client-UUID": "09f12091-70b5-4b26-b277-1898d31951e6",
-                "x-csrf-token": "f72cd751163e66e684bfbb66475db361b7bf2c986005bd01dd5cf048cce54c99ad6eb295b5293598156a89f2ab9a6f5a9524c7d909fc4a34b473a4dc3e8d1a5f68763676c554857c6a831e3959a91a07",
-                "x-twitter-active-user": "yes",
-                "x-twitter-auth-type": "OAuth2Session",
-                "x-twitter-client-language": "en"
-                }
-
-user_header_3 = {
-            "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "en-US,en;q=0.5",
-            "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-            "Connection": "keep-alive",
-            "content-type": "application/json",
-            "Cookie": "guest_id_marketing=v1%3A171379353291918111; guest_id_ads=v1%3A171379353291918111; personalization_id=\"v1_KWr/PP8PIQMmcxsSiI2mPg==\"; _ga=GA1.2.407514221.1713447191; g_state={\"i_l\":1,\"i_p\":1713800698044}; kdt=VEcTPaQvk3prU87Ar4MM7P5bLPc66vDjmV9q2GRa; lang=en; att=1-JnETQvoehBug6emlr8wcLgCYgCSUpFSqFphk3iqO; dnt=1; gt=1782403076642443538; guest_id=v1%3A171379353291918111; _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoHaWQiJTgxYmE5OWJmYzBmZGYyN2QzOTIyYmYx%250AOWQyMDlhNWViOg9jcmVhdGVkX2F0bCsIdbgRBo8BOgxjc3JmX2lkIiU2YjA2%250ANWQyNjFlZmU5NjE4MDExZDk1OGJjY2YwOGUwOQ%253D%253D--1621511d0908501db888fa44fe42059a47454611; twid=u%3D1782406349592154112; ct0=6168cda4def423cf818ced997eb718681e420ee5e57a0aed5d2f1f7993fa6cd6f969bbe4f158be4346c521051d87d3c8dfc3d811061ffe9686e4da4971812171dcf604d136c58f072915bfad55af0739; auth_token=e49b4ce11ccb45e2c5878b10f5df17e20a47f159",
-            "Host": "twitter.com",
-            "Referer": "https://twitter.com/FD",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
-            "TE": "trailers",
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
-            "x-client-transaction-id": "8n4ACIk9vvbQ4YzyoW5JY1p/cKT5tFM2M2tW8OOhIpmMJYjpJ0cbrzI3e/vjqRwQSn/1JfPXsvibVs7T4FfLsgK90n5q8Q",
-            "X-Client-UUID": "56aa1c1d-9311-4d25-9633-c1613cab5fdd",
-            "x-csrf-token": "6168cda4def423cf818ced997eb718681e420ee5e57a0aed5d2f1f7993fa6cd6f969bbe4f158be4346c521051d87d3c8dfc3d811061ffe9686e4da4971812171dcf604d136c58f072915bfad55af0739",
-            "x-twitter-active-user": "yes",
-            "x-twitter-auth-type": "OAuth2Session",
-            "x-twitter-client-language": "en"
-            }
-
-def get_next_topic(json_file_path='dags/topics/topic.json'):
-    try:
-        with open(json_file_path, 'r', encoding='utf-8') as file:
-            topics = json.load(file)
-            log_value = read_from_log()
-            print("Log value:", log_value)
-            print("Number of topics:", len(topics.keys()))
-
-            if len(topics.keys()) == log_value:
-                keep_last_line_only()
-                write_to_log(new_line="0")
-                print("Reset log to 0. No action needed.")
-                return {}
-
-            else:
-                key_index = log_value
-                key = list(topics.keys())[key_index]
-                keep_last_line_only()
-                write_to_log(new_line=str(log_value + 1))
-                print("Returning topic:", {key: topics[key]})
-                return {key: topics[key]}
-
-    except FileNotFoundError:
-        print(f"Error: File '{json_file_path}' not found.")
-        return {}
-
-def write_to_log(file_path="dags/topics/logTopics.txt", new_line="0"):
-    try:
-        with open(file_path, 'a', encoding='utf-8') as file:
-            file.write(new_line + '\n')  # Append the new line of text followed by a newline character
-            print("New line added to logTopics.txt:", new_line)
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-
-def read_from_log(file_path="dags/topics/logTopics.txt"):
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-            if lines:
-                last_line = lines[-1].strip()
-                return int(last_line)
-            else:
-                return 0
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        return None
-
-def keep_last_line_only(file_path="dags/topics/logTopics.txt"):
-    try:
-        # Read all lines from the file
-        with open(file_path, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-
-        # Check if there are more than two lines
-        if len(lines) > 1:
-            # Extract the last line
-            last_line = lines[-1].strip()
-
-            # Write only the last line back to the file
-            with open(file_path, 'w', encoding='utf-8') as file:
-                file.write(last_line + '\n')
-                print("Only the last line kept in logTopics.txt:", last_line)
-        else:
-            print("No action needed. File has one or zero lines.")
-
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-
-def save_json_to_temp_file(data):
-    """
-    Saves JSON data to a temporary file and returns the path of the temporary file.
-
-    Args:
-        data (dict): Dictionary containing JSON serializable data.
-
-    Returns:
-        str: Path of the temporary file where JSON data is stored.
-    """
-    try:
-        # Create a temporary file
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
-            # Write JSON data to the temporary file
-            json.dump(data, temp_file, indent=4)
-            temp_file.flush()  # Flush to ensure data is written to the file
-            temp_file.seek(0)  # Move file pointer to the beginning
-
-            # Get the temporary file path
-            temp_file_path = temp_file.name
-
-            return temp_file_path
-
-    except Exception as e:
-        print(f"Error occurred while saving JSON to temporary file: {e}")
-        return None
-
-def read_json_file(file_path):
-    """
-    Reads JSON data from a file and returns the parsed JSON content as a dictionary.
-
-    Args:
-        file_path (str): Path to the JSON file.
-
-    Returns:
-        dict or None: Parsed JSON content as a dictionary, or None if an error occurs.
-    """
-    try:
-        with open(file_path, 'r') as json_file:
-            json_data = json.load(json_file)
-            return json_data
-    except FileNotFoundError:
-        print(f"Error: JSON file not found at '{file_path}'.")
-    except json.JSONDecodeError as e:
-        print(f"Error: Failed to decode JSON from file '{file_path}'. {e}")
-    except Exception as e:
-        print(f"Error occurred while reading JSON file '{file_path}': {e}")
-    return None
-  
-last_keyword = None
-
-def get_random_user():
-    global last_keyword
-    keywords = ['user_header_1', 'user_header_2', 'user_header_3']
-    
-    while True:
-        keyword = random.choice(keywords)
-        if keyword != last_keyword:
-            last_keyword = keyword
-            return keyword
-
-def extract_json_data(search,next_page="",header=user_header_1):
+def extract_json_data(search,next_page=""):
     # Define the URL
     url = "https://twitter.com/i/api/graphql/LcI5kBN8BLC7ovF7mBEBHg/SearchTimeline"
 
     # Define the request parameters
     variables = {"rawQuery": search, "count": 20, "querySource": "typed_query", "product": "Latest","cursor":next_page}
-    
     features = {
         "rweb_tipjar_consumption_enabled": False,
         "responsive_web_graphql_exclude_directive_enabled": True,
@@ -240,7 +41,28 @@ def extract_json_data(search,next_page="",header=user_header_1):
     }
 
     # Define the headers
-    headers = header
+    headers = {
+          "Accept": "*/*",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Language": "en-US,en;q=0.5",
+          "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
+          "Connection": "keep-alive",
+          "content-type": "application/json",
+          "Cookie": "g_state={\"i_l\":0}; kdt=jdeWo36eab8HLeYm861t6VOrOgR2lnmeBjQm8zB0; des_opt_in=Y; dnt=1; lang=en; d_prefs=MjoxLGNvbnNlbnRfdmVyc2lvbjoyLHRleHRfdmVyc2lvbjoxMDAw; guest_id=v1%3A171331275986956815; gt=1780389843245154599; twid=u%3D1780389902699401217; ct0=a4340c3c75d5eee745277932bae7d0c01fb3a203e1a1dc33212faca210fd1041c57850e05c5cf8f2263e0ee855199b9c77ac1cb5b6af2d8d63981c9c666a2cb93d20da68c93b1b593e621118ce1319c1; auth_token=d788596838a1244ba1a651572277b9fb7ce139a1; guest_id_marketing=v1%3A171331275986956815; guest_id_ads=v1%3A171331275986956815; personalization_id=\"v1_7F3bjEu2h8DWBNcQjX5VKw==\"",
+          "Host": "twitter.com",
+          "Sec-Fetch-Dest": "empty",
+          "Sec-Fetch-Mode": "cors",
+          "Sec-Fetch-Site": "same-origin",
+          "TE": "trailers",
+          "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0",
+          "x-client-transaction-id": "mtKxi8974foGRAMPFY44merEYKx1ma55xqiE8UJ0ndomVtcGbOVBqVVIbn1D//MSeLMoVZsaN1bKGDLFTSRUWkHVdvg6mQ",
+          "X-Client-UUID": "4198c768-ae7c-4f08-b296-628102e0ac82",
+          "x-csrf-token": "a4340c3c75d5eee745277932bae7d0c01fb3a203e1a1dc33212faca210fd1041c57850e05c5cf8f2263e0ee855199b9c77ac1cb5b6af2d8d63981c9c666a2cb93d20da68c93b1b593e621118ce1319c1",
+          "x-twitter-active-user": "yes",
+          "x-twitter-auth-type": "OAuth2Session",
+          "x-twitter-client-language": "en"
+      }
+
     # Send the GET request
     response = requests.get(url, params={"variables": json.dumps(variables), "features": json.dumps(features)}, headers=headers)
 
@@ -280,49 +102,40 @@ def get_response_count(response_json):
         #print("KeyError: Could not find the specified key in the response JSON.")
         return 0
     
-def extract_batch_data(tweet_topics,header=user_header_1,**kwargs):
+def extract_batch_data(tweet_topics):
   raw_data = []
-  for _, values in tweet_topics.items():
+  for topic, values in tweet_topics.items():
       for value in values:
           try:
-            response_json = extract_json_data(value,header=header)
+            response_json = extract_json_data(value)
             if get_response_count(response_json) > 0:
                 raw_data.append(response_json)
             else:
                 break
-            for i in range(4):
+            for i in range(10):
               if i == 0 :
                   next_page = len(response_json['data']['search_by_raw_query']['search_timeline']['timeline']['instructions'][0]['entries'])-1
                   next_page = response_json['data']['search_by_raw_query']['search_timeline']['timeline']['instructions'][0]['entries'][next_page]['content']['value']
-                  response_json = extract_json_data(value,next_page,header=header)
+                  response_json = extract_json_data(value,next_page)
                   if get_response_count(response_json) > 0:
                       raw_data.append(response_json)
                   else:
                       break
               else :
                   next_page = response_json['data']['search_by_raw_query']['search_timeline']['timeline']['instructions'][2]['entry']['content']['value']
-                  response_json = extract_json_data(value,next_page,header=header)
+                  response_json = extract_json_data(value,next_page)
                   if get_response_count(response_json) > 0:
                       raw_data.append(response_json)
                   else:
                       break
-              time.sleep(5)
+              time.sleep(1.5)
           except Exception as ex:
               print(ex)
-          time.sleep(2.5)
+          time.sleep(0.7)
+  return raw_data
 
-
-  temp_file = save_json_to_temp_file(raw_data) 
-  kwargs['ti'].xcom_push(key='raw_batch_data_key', value=temp_file) 
+def transform_batch_data(raw_data,topic):
   
-  return True,temp_file
-
-def transform_batch_data(topic,**kwargs):
-  
-  temp_file = kwargs['ti'].xcom_pull(task_ids='extract_tweets_task', key='raw_batch_data_key')
-
-  raw_data = read_json_file(file_path=temp_file)
-
   tweets_data = []
 
   for response_json in raw_data : 
@@ -377,17 +190,9 @@ def transform_batch_data(topic,**kwargs):
               # Handle other exceptions
               print("Exception:", ex)
 
-  temp_file = save_json_to_temp_file(tweets_data) 
-  kwargs['ti'].xcom_push(key='clean_data_key', value=temp_file) 
-  
-  return True,temp_file
+  return tweets_data
 
-def load_to_mongodb(**kwargs):
-    
-    temp_file = kwargs['ti'].xcom_pull(task_ids='transform_tweets_task', key='clean_data_key')
-
-    data_to_insert = read_json_file(file_path=temp_file)
-
+def load_to_mongodb(data_to_insert):
     # MongoDB connection URL
     url = "mongodb+srv://mlteam:mlteam1234@cluster0.6y3bpz0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
@@ -411,13 +216,100 @@ def load_to_mongodb(**kwargs):
         # Close the connection
         client.close()
 
+tweet_topics = {
+    'Politics': [
+        'الحكومة المغربية', 'gouvernement marocain', 'Moroccan government',
+        'الانتخابات في المغرب', 'élections au Maroc', 'elections in Morocco',
+        'السياسة الخارجية للمغرب', 'politique étrangère du Maroc', "Morocco's foreign policy"
+    ],
+    'Economy': [
+        'النمو الاقتصادي في المغرب', 'croissance économique au Maroc', 'economic growth in Morocco',
+        'سوق العمل المغربي', 'marché du travail marocain', 'Moroccan job market',
+        'الاستثمار في المغرب', 'investissement au Maroc', 'investment in Morocco'
+    ],
+    'Culture': [
+        'الفن المغربي', 'art marocain', 'Moroccan art',
+        'التراث المغربي', 'patrimoine marocain', 'Moroccan heritage',
+        'الأدب المغربي', 'littérature marocaine', 'Moroccan literature'
+    ],
+    'Social Issues': [
+        'الفقر في المغرب', 'pauvreté au Maroc', 'poverty in Morocco',
+        'التعليم في المغرب', 'éducation au Maroc', 'education in Morocco',
+        'الصحة في المغرب', 'santé au Maroc', 'healthcare in Morocco'
+    ],
+    'Technology': [
+        'الابتكار التكنولوجي في المغرب', 'innovation technologique au Maroc', 'technological innovation in Morocco',
+        'شركات التكنولوجيا في المغرب', 'entreprises technologiques au Maroc', 'technology companies in Morocco',
+        'تطور التكنولوجيا في المغرب', 'évolution technologique au Maroc', 'technological advancement in Morocco'
+    ],
+    'Environment': [
+        'التلوث في المغرب', 'pollution au Maroc', 'pollution in Morocco',
+        'حماية البيئة في المغرب', 'protection de l\'environnement au Maroc', 'environmental protection in Morocco',
+        'التغير المناخي في المغرب', 'changement climatique au Maroc', 'climate change in Morocco'
+    ],
+    'Sport': ['رياضة في المغرب', 'sport au Maroc', 'sport in Morocco',
+    'كرة القدم المغربية', 'football marocain', 'Moroccan football',
+    'الألعاب الأولمبية في المغرب', 'Jeux olympiques au Maroc', 'Olympic Games in Morocco'
+    ],
+    "Education Reform": [
+    "إصلاح التعليم في المغرب",
+    "réforme de l'éducation au Maroc",
+    "education reform in Morocco"
+  ],
+  "Youth Empowerment": [
+    "تمكين الشباب في المغرب",
+    "autonomisation des jeunes au Maroc",
+    "youth empowerment in Morocco"
+  ],
+  "Digital Transformation": [
+    "التحول الرقمي في المغرب",
+    "transformation numérique au Maroc",
+    "digital transformation in Morocco"
+  ],
+  "Gender Equality": [
+    "المساواة بين الجنسين في المغرب",
+    "égalité des genres au Maroc",
+    "gender equality in Morocco"
+  ],
+  "Infrastructure Development": [
+    "تطوير البنية التحتية في المغرب",
+    "développement des infrastructures au Maroc",
+    "infrastructure development in Morocco"
+  ],
+  "Cultural Exchange": [
+    "تبادل ثقافي بين المغرب والعالم",
+    "échange culturel entre le Maroc et le monde",
+    "cultural exchange between Morocco and the world"
+  ],
+  "Entrepreneurship": [
+    "ريادة الأعمال في المغرب",
+    "entrepreneuriat au Maroc",
+    "entrepreneurship in Morocco"
+  ],
+  "Tourism": [
+    "السياحة في المغرب",
+    "tourisme au Maroc",
+    "tourism in Morocco"
+  ],
+  "Public Health Policies": [
+    "سياسات الصحة العامة في المغرب",
+    "politiques de santé publique au Maroc",
+    "public health policies in Morocco"
+  ],
+  "Rural Development": [
+    "تنمية الريف في المغرب",
+    "développement rural au Maroc",
+    "rural development in Morocco"
+  ]
+}
+
 # Define the DAG settings
 default_args = {
-    'owner': 'MLTeam',
+    'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 4, 24),
+    'start_date': datetime(2024, 4, 21),
     'retries': 1,
-    'retry_delay': timedelta(minutes=10),
+    'retry_delay': timedelta(minutes=5),
 }
 
 # Define the DAG
@@ -425,34 +317,32 @@ dag = DAG(
     'tweet_topics_processing',
     default_args=default_args,
     description='Process tweet topics data',
-    schedule_interval='@daily',
+    schedule_interval='@hourly',
 )
 
-tweets_dict = get_next_topic()
-user = get_random_user()
-
-# Define tasks for each topic
-extract_task = PythonOperator(
-        task_id=f'extract_tweets_task',
+# Define and chain tasks for each topic
+for topic, keywords in tweet_topics.items():
+    # Define tasks for extract, transform, and load
+    extract_task = PythonOperator(
+        task_id=f'extract_{topic.lower()}',
         python_callable=extract_batch_data,
-        op_kwargs={'tweet_topics': tweets_dict,"header":user},
+        op_args=[tweet_topics, topic],
         dag=dag,
     )
 
-transform_task = PythonOperator(
-        task_id='transform_tweets_task',
+    transform_task = PythonOperator(
+        task_id=f'transform_{topic.lower()}',
         python_callable=transform_batch_data,
-        op_kwargs={'topic': tweets_dict.keys()},
+        op_args=[topic],
         dag=dag,
     )
 
-load_task = PythonOperator(
-        task_id=f'load_tweets_to_mongodb_task',
+    load_task = PythonOperator(
+        task_id=f'load_{topic.lower()}',
         python_callable=load_to_mongodb,
-        op_kwargs={'clean_data': "topic"},
+        op_args=[topic],
         dag=dag,
     )
 
-    # Set task dependencies
-
-extract_task >> transform_task >> load_task
+    # Chain tasks
+    extract_task >> transform_task >> load_task
