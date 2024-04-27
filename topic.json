@@ -1,0 +1,35 @@
+{
+    "Politics": [
+        "الحكومة المغربية", "gouvernement marocain", "Moroccan government",
+        "السياسة الخارجية للمغرب", "politique étrangère du Maroc", "Morocco foreign policy"
+    ],
+    "Economy": [
+        "النمو الاقتصادي في المغرب", "croissance économique au Maroc", "economic growth in Morocco",
+        "الاستثمار في المغرب", "investissement au Maroc", "investment in Morocco"
+    ],
+    "Culture": [
+        "الفن المغربي", "art marocain", "Moroccan art",
+        "الأدب المغربي", "littérature marocaine", "Moroccan literature"
+    ],
+    "Technology": [
+        "الابتكار التكنولوجي في المغرب", "innovation technologique au Maroc", "technological innovation in Morocco",
+        "شركات التكنولوجيا في المغرب", "entreprises technologiques au Maroc", "technology companies in Morocco"
+    ],
+    "Environment": [
+        "التلوث في المغرب", "pollution au Maroc", "pollution in Morocco",
+        "حماية البيئة في المغرب", "protection de l\"environnement au Maroc", "environmental protection in Morocco"
+    ],
+    "Sport": [
+        "رياضة في المغرب", "sport au Maroc", "sport in Morocco",
+        "الألعاب الأولمبية في المغرب", "Jeux olympiques au Maroc", "Olympic Games in Morocco"
+    ],
+    "Education": [
+      "إصلاح التعليم في المغرب","réforme de l'éducation au Maroc","education reform in Morocco",
+      "التعليم في المغرب", "éducation au Maroc", "education in Morocco"
+    ],
+    "Tourism": [
+    "السياحة في المغرب","tourisme au Maroc","tourism in Morocco","ترويج السياحة في المغرب",
+    "promotion du tourisme au Maroc","promoting tourism in Morocco","معالم سياحية في المغرب",
+    "sites touristiques au Maroc","tourist attractions in Morocco"
+    ]
+}
